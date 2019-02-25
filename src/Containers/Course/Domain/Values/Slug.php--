@@ -1,0 +1,60 @@
+<?php
+
+namespace Edhub\CMS\Containers\Course\Domain\Values;
+
+class Slug
+{
+    /**
+     * @var string  Generated slug from title.
+     */
+    private $slug = '';
+
+    private function __construct() {}
+
+    public static function fromSlug(string $slug): Slug
+    {
+        $slugValue = new self;
+        $slugValue->slug = $slug;
+
+        return $slugValue;
+    }
+
+    public static function new(string $title): Slug
+    {
+        $slugValue = new self;
+        $slugValue->slug = $slugValue->slugify($title);
+
+        return $slugValue;
+    }
+
+    public function value(): string
+    {
+        return $this->slug;
+    }
+
+    /**
+     * Transform title to slug.
+     *
+     * @param string $title
+     * @return string
+     */
+    private function slugify(string $title): string
+    {
+        $separator = '-';
+        // Convert all dashes/underscores into separator
+        $flip = '_';
+
+        $slug = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
+
+        // Replace @ with the word 'at'
+        $slug = str_replace('@', $separator.'at'.$separator, $slug);
+
+        // Remove all characters that are not the separator, letters, numbers, or whitespace.
+        $slug = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', mb_strtolower($slug));
+
+        // Replace all separator characters and whitespace by a single separator
+        $slug = preg_replace('!['.preg_quote($separator).'\s]+!u', $separator, $slug);
+
+        return trim($slug, $separator);
+    }
+}

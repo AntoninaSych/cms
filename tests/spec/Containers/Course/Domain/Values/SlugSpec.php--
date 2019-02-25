@@ -1,0 +1,33 @@
+<?php
+
+namespace spec\Edhub\CMS\Containers\Courses\Domain\Values;
+
+use Edhub\CMS\Containers\Courses\Domain\Values\Slug;
+use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
+
+class SlugSpec extends ObjectBehavior
+{
+    public function it_is_initializable()
+    {
+        $this->shouldHaveType(Slug::class);
+    }
+
+    public function it_should_generate_slug_for_provided_title()
+    {
+        $title = 'Test title';
+
+        $this->beConstructedThrough('new', [$title]);
+
+        $this->value()->shouldBe('test-title');
+    }
+
+    public function it_can_keep_already_slugged_value()
+    {
+        $slug = 'test-slug';
+
+        $this->beConstructedThrough('fromSlug', [$slug]);
+
+        $this->value()->shouldBe($slug);
+    }
+}

@@ -1,0 +1,44 @@
+<?php
+
+namespace spec\Edhub\CMS\Containers\Courses\Application\Actions\CreateCourse;
+
+use Edhub\CMS\Containers\Courses\Application\Actions\CreateCourse\CreateCourseAction;
+use Edhub\CMS\Containers\Courses\Application\Actions\CreateCourse\CreateCourseTransporter;
+use Edhub\CMS\Containers\Courses\Domain\Entities\Course;
+use Edhub\CMS\Containers\Courses\Domain\Repositories\CourseCategories;
+use Edhub\CMS\Containers\Courses\Domain\Repositories\CourseRepository;
+use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
+
+class CreateCourseActionSpec extends ObjectBehavior
+{
+    public function let(CourseRepository $courseRepository, CourseCategories $courseCategories)
+    {
+        $this->beConstructedWith($courseRepository, $courseCategories);
+    }
+
+    public function it_is_initializable()
+    {
+        $this->shouldHaveType(CreateCourseAction::class);
+    }
+
+    public function it_should_store_course_to_repository(CourseRepository $courseRepository, Course $course, CourseCategories $courseCategories)
+    {
+        $createCourseTransporter = new CreateCourseTransporter([
+            'title' => 'Test',
+            'language' => 'en',
+            'status' => 1,
+            'companies' => [
+                [
+                    'company' => 1,
+                    'isPublic' => true
+                ]
+            ]
+        ]);
+        $courseCategories->findByIds(1)->shouldBeCalled();
+
+        $this->run($createCourseTransporter)->shouldHaveType(Course::class);
+
+        $courseRepository->save(Course::class)->shouldBeCalled();
+    }
+}
